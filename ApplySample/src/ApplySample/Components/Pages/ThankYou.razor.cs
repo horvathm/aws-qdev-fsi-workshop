@@ -1,0 +1,65 @@
+﻿using Microsoft.AspNetCore.Components;
+using ApplySample.Util;
+
+namespace ApplySample.Components.Pages
+{
+    public partial class ThankYou
+    {
+        [Inject]
+        private IConfiguration _config { get; set; }
+
+        [Inject]
+        private AWSConfig _awsconfig { get; set; }
+
+        private string displayMessage { get; set; }
+
+        private string errorMessage;
+
+        private bool isLoading;
+
+        [CascadingParameter]
+        public Home Parent { get; set; }
+
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                isLoading = true;
+                errorMessage = null;
+
+                var regionString = _config["AWS:Region"];
+                var apiBaseUrl = _awsconfig.GetStringFromSSM(_config["AWS:ApiGateway:InvokeUrl"]);
+                var resourcePath = _awsconfig.GetStringFromSSM(_config["AWS:ApiGateway:StatusPath"]);
+                var apiPath = resourcePath.Replace("{applicationId}", Parent.ApplicationId);
+                //remove trailing / in apiBaseUrl
+                if (apiBaseUrl.EndsWith("/"))
+                {
+                    apiBaseUrl = apiBaseUrl.Substring(0, apiBaseUrl.Length - 1);
+                }
+                var apiInvokeUrl = $"{apiBaseUrl}{apiPath}";
+
+                var httpClient = new HttpClient();
+                var response = HttpHelpers.Get(HttpHelpers.AWS_APIGATEWAY, regionString, apiInvokeUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var overallStatus = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Application {Parent.ApplicationId} status retrieved: {overallStatus}");
+                    displayMessage = string.Compare(overallStatus.Trim(), "10") == 0 ?
+                        "Your application is approved. We will be in touch in a few business days." :
+                        "Your application is being reviewed. We will be reaching out to you if we need more details.";
+                }
+                else
+                {
+                    errorMessage = $"Error: {response.StatusCode}";
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"An error occurred while retrieving your application. {ex.Message}";
+                Console.WriteLine($"Error calling API: {ex.Message}");
+            }
+        }
+
+    }
+}

@@ -1,0 +1,38 @@
+﻿@using ApplySample.Models
+@using System.ComponentModel.DataAnnotations
+@rendermode InteractiveServer
+<h3>Apply Now</h3>
+<div class="row">
+    <div class="col-md-6">
+        <EditForm Model="@model" OnValidSubmit="@HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group mb-3">
+                <label for="firstName">First Name</label>
+                <InputText type="text" class="form-control" id="firstName" @bind-Value="model.FirstName" />
+                <ValidationMessage For="@(() => model.FirstName)" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="lastName">Last Name</label>
+                <InputText type="text" class="form-control" id="lastName" @bind-Value="model.LastName" />
+                <ValidationMessage For="@(() => model.LastName)" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="email">Email</label>
+                <InputText type="email" class="form-control" id="email" @bind-Value="model.Email" />
+                <ValidationMessage For="@(() => model.Email)" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Next</button>
+        </EditForm>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        @errorMessage
+    </div>
+</div>
+

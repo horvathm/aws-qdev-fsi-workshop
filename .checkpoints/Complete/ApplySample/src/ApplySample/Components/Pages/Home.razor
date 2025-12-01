@@ -1,0 +1,47 @@
+﻿@page "/"
+@using ApplySample.Models
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+
+<PageTitle>Home</PageTitle>
+
+<CascadingValue Value="this" IsFixed="true">
+    @switch (CurrentStep)
+    {
+        case ApplicationSteps.Apply:
+            <ApplyStart />
+            break;
+
+        case ApplicationSteps.Details:
+            <CustomerDetails />
+            break;
+        case ApplicationSteps.Income:
+            <ProofIncome />
+            break;
+        case ApplicationSteps.Identity:
+            <IdDocument />
+            break;
+        case ApplicationSteps.Selfie:
+            <Selfie />
+            break;
+        case ApplicationSteps.Confirm:
+            <ThankYou />
+            break;
+        default:
+            NavigationManager.NavigateTo("/error");
+            break;
+    }
+</CascadingValue>
+
+@code {
+    public string ApplicationId { get; set; }
+    public ApplicationSteps CurrentStep { get; private set; } = ApplicationSteps.Apply;
+
+    public void GoToStep(ApplicationSteps nextStep)
+    {
+        Console.WriteLine($"Home - Changing step to: {nextStep}");
+        CurrentStep = nextStep;
+        StateHasChanged();
+    }
+
+}

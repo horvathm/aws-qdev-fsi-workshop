@@ -1,0 +1,43 @@
+@Origination_HostAddress = http://localhost:6268
+
+
+### Create a new application record
+POST {{Origination_HostAddress}}/Application
+Content-Type: application/json
+
+{
+  "productType": "CCard001",
+  "firstName": "Jane",
+  "lastName": "Citizen",
+  "email": "jane.citizen@amazon.com"
+}
+
+
+### Retrieve the newly created application record
+@ApplicationId = 4d211a22-0302-4456-9ddd-d8e229649165
+
+GET {{Origination_HostAddress}}/Application/{{ApplicationId}}
+
+
+
+### Submit customer details
+POST {{Origination_HostAddress}}/Application/{{ApplicationId}}/customer
+Content-Type: application/json
+
+{
+  "firstName": "Jane",
+  "lastName": "Citizen",
+  "dateOfBirth": "1981-12-10",
+  "email": "updated.email@gmail.com",
+  "phoneNumber": "98634197",
+  "address": "18 Hwy 50",
+  "city": "Stateline",
+  "state": "Nevada",
+  "postCode": "89449",
+  "country": "USA"
+}
+
+### Retrieve the application record again
+
+GET {{Origination_HostAddress}}/Application/{{ApplicationId}}
+

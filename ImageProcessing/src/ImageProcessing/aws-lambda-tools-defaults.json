@@ -1,0 +1,14 @@
+{
+  "Information": [
+    "This file provides default values for the Lambda deployment."
+  ],
+  "profile": "",
+  "region": "XXXX-PLACEHOLDER-XXXX",
+  "configuration": "Release",
+  "function-runtime": "dotnet8",
+  "function-memory-size": 512,
+  "function-timeout": 90,
+  "environment-variables": "\"S3BucketName\"=\"XXXX-PLACEHOLDER-XXXX\";\"ServiceName\"=\"ImageProcessingSvc\";\"EventName\"=\"application.image.processed\";\"EventbusName\"=\"workshop-events\";\"SimilarityScoreThreshold\"=\"90\";",
+  "function-role": "Your-LambdaExecutionRole",
+  "function-handler": "ImageProcessing::ImageProcessing.Function::Handler"
+}

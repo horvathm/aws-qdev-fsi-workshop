@@ -1,0 +1,15 @@
+{
+  "Information": [
+    "This file provides default values for the Lambda deployment."
+  ],
+  "profile": "",
+  "region": "XXXX-PLACEHOLDER-XXXX",
+  "configuration": "Release",
+  "function-architecture": "arm64",
+  "function-runtime": "dotnet8",
+  "function-memory-size": 128,
+  "function-timeout": 120,
+  "environment-variables": "\"S3BucketName\"=\"XXXX-PLACEHOLDER-XXXX\";\"ServiceName\"=\"DocumentProcessingSvc\";\"EventName\"=\"application.document.processed\";\"EventbusName\"=\"workshop-events\";\"IncomeQuery\"=\"what is the salary amount?\";\"MinIncome\"=\"5000\";\"IdDocQuery\"=\"What is the expiry date?\";",
+  "function-role": "WorkshopLambdaExecutionRole",
+  "function-handler": "DocumentProcessing"
+}

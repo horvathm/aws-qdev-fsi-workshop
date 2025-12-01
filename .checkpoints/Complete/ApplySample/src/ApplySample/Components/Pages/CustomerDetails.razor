@@ -1,0 +1,57 @@
+﻿@using ApplySample.Models
+@using System.ComponentModel.DataAnnotations
+@rendermode InteractiveServer
+<h3>Tell us more about you</h3>
+<div class="row">
+    <div class="col-md-6">
+        <EditForm Model="@model" OnValidSubmit="@HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group mb-3">
+                <label for="email">Phone Number</label>
+                <InputText type="text" class="form-control" id="country" @bind-Value="model.PhoneNumber" />
+                <ValidationMessage For="@(() => model.PhoneNumber)" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="firstName">Address</label>
+                <InputText type="text" class="form-control" id="address" @bind-Value="model.Address" />
+                <ValidationMessage For="@(() => model.Address)" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="lastName">City</label>
+                <InputText type="text" class="form-control" id="city" @bind-Value="model.City" />
+                <ValidationMessage For="@(() => model.City)" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="email">State</label>
+                <InputText type="text" class="form-control" id="state" @bind-Value="model.State" />
+                <ValidationMessage For="@(() => model.State)" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="email">Postcode</label>
+                <InputText type="text" class="form-control" id="postcode" @bind-Value="model.Postcode" />
+                <ValidationMessage For="@(() => model.Postcode)" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="email">Country</label>
+                <InputText type="text" class="form-control" id="country" @bind-Value="model.Country" />
+                <ValidationMessage For="@(() => model.Country)" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Next</button>
+        </EditForm>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        @errorMessage
+    </div>
+</div>
+
+

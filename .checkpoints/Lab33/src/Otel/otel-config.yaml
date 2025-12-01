@@ -1,0 +1,39 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+processors:
+  filter/hc:
+    spans:
+      exclude:
+        match_type: strict
+        attributes:
+          - key: http.route
+            value: "/hc"
+
+exporters:
+  debug:
+    verbosity: detailed
+  awsxray:
+  awsemf:
+    namespace: ECS/AWSOTel/Application
+    log_group_name: '/aws/ecs/origination/metrics'
+
+service:
+  pipelines:
+    traces:
+      receivers:
+        - otlp
+      processors:
+        - filter/hc
+      exporters:
+        - debug
+        - awsxray
+    metrics:
+      receivers:
+        - otlp
+      exporters:
+        - debug
+        - awsemf

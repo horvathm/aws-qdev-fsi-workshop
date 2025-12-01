@@ -1,0 +1,35 @@
+﻿@using ApplySample.Models
+@using System.ComponentModel.DataAnnotations
+@rendermode InteractiveServer
+
+<h3>Your Income</h3>
+
+<div class="row">
+    <div class="col-md-6">
+        <EditForm Model="@model" OnValidSubmit="@HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group mb-3">
+                <label for="fileUpload">Last Payslip (PDF, JPG, JPEG, or PNG only)</label>
+                <InputFile id="fileUpload"
+                           OnChange="@HandleFileUpload"
+                           class="form-control"
+                           accept=".pdf,.jpg,.jpeg,.png" />
+                @if (!string.IsNullOrEmpty(uploadMessage))
+                {
+                    <div class="@messageClass mt-2">
+                        @uploadMessage
+                    </div>
+                }
+            </div>
+
+            <button type="submit" class="btn btn-primary">Next</button>
+        </EditForm>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        @errorMessage
+    </div>
+</div>
+
