@@ -41,7 +41,25 @@ namespace ImageProcessing.Services
         /// <returns>FaceComparisonResult object containing the outcome of the face comparison</returns>
         public FaceComparisonResult CompareFaces(string applicationId, string s3BucketName, string path1, string path2, float similarityThreshold)
         {
-            
+            var compareFacesRequest = new CompareFacesRequest()
+            {
+                SourceImage = new Image() { S3Object = new S3Object() { Bucket = s3BucketName, Name = path1 } },
+                TargetImage = new Image() { S3Object = new S3Object() { Bucket = s3BucketName, Name = path2 } },
+                SimilarityThreshold = similarityThreshold
+            };
+            var compareFacesResponse = _rekognitionClient.CompareFacesAsync(compareFacesRequest).Result;
+
+            return new FaceComparisonResult()
+            {
+                ApplicationId = applicationId,
+                Path1 = path1,
+                Path2 = path2,
+                DocType = (int)DocumentType.SELFIE,
+                Status = compareFacesResponse.FaceMatches.Count > 0 ? 10 : 2,
+                Remarks = compareFacesResponse.FaceMatches.Count > 0 
+                    ? $"Face matches with similarity score of {compareFacesResponse.FaceMatches.Max(f => f.Similarity)}%" 
+                    : "Faces do not match"
+            };
         }
 
         public void PublishEvent(object payload, string? eventNameOverride = "")

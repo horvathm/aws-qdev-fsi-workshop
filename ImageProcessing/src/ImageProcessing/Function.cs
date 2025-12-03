@@ -24,7 +24,8 @@ namespace ImageProcessing
                 // Using the _imageProcessor service:
                 // - Invoke CompareFaces, put results in variable named _result
                 // - Invoke PublishEvent, passing in the _result
-
+                var _result = _imageProcessor.CompareFaces(applicationEvent.Detail.ApplicationId, s3BucketName, applicationEvent.Detail.Path1, applicationEvent.Detail.Path2, similarityThreshold);
+                _imageProcessor.PublishEvent(_result);
             }
             catch (Exception ex)
             {
