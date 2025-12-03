@@ -1,0 +1,217 @@
+2025-12-03T09:59:45.000Z
+{
+    "version": "0",
+    "id": "8cc4f4d2-2aa8-17d5-abf9-0dd42addcc94",
+    "detail-type": "application.started",
+    "source": "OriginationSvc",
+    "account": "251270210711",
+    "time": "2025-12-03T09:59:45Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "ApplicationId": "505140e4-4be1-4842-952a-6e5ed463493a",
+        "UtcTime": "12/03/2025 09:59"
+    }
+}
+
+{"version":"0","id":"8cc4f4d2-2aa8-17d5-abf9-0dd42addcc94","detail-type":"application.started","source":"OriginationSvc","account":"251270210711","time":"2025-12-03T09:59:45Z","region":"us-east-1","resources":[],"detail":{"ApplicationId":"505140e4-4be1-4842-952a-6e5ed463493a","UtcTime":"12/03/2025 09:59"}}
+daae0539-8ad2-382b-90d1-bb7a178ff574
+2025-12-03T10:00:10.000Z
+{
+    "version": "0",
+    "id": "ce35317f-f3b7-ccb1-1cc8-4339ada71455",
+    "detail-type": "application.file.upload",
+    "source": "OriginationSvc",
+    "account": "251270210711",
+    "time": "2025-12-03T10:00:10Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "ApplicationId": "505140e4-4be1-4842-952a-6e5ed463493a",
+        "DocType": 1,
+        "Path": "UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/INCOMESTATEMENT/payslip-dog.jpg",
+        "UtcTime": "12/03/2025 10:00"
+    }
+}
+
+{"version":"0","id":"ce35317f-f3b7-ccb1-1cc8-4339ada71455","detail-type":"application.file.upload","source":"OriginationSvc","account":"251270210711","time":"2025-12-03T10:00:10Z","region":"us-east-1","resources":[],"detail":{"ApplicationId":"505140e4-4be1-4842-952a-6e5ed463493a","DocType":1,"Path":"UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/INCOMESTATEMENT/payslip-dog.jpg","UtcTime":"12/03/2025 10:00"}}
+5f1d9e84-aa67-30cc-bf65-da202eaecee7
+2025-12-03T10:00:19.000Z
+{
+    "version": "0",
+    "id": "040624c2-bdde-3cd4-b05c-6a9ac8c94c99",
+    "detail-type": "application.file.upload",
+    "source": "OriginationSvc",
+    "account": "251270210711",
+    "time": "2025-12-03T10:00:19Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "ApplicationId": "505140e4-4be1-4842-952a-6e5ed463493a",
+        "DocType": 2,
+        "Path": "UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/IDENTITYDOCUMENT/passport-specimen.jpg",
+        "UtcTime": "12/03/2025 10:00"
+    }
+}
+
+{"version":"0","id":"040624c2-bdde-3cd4-b05c-6a9ac8c94c99","detail-type":"application.file.upload","source":"OriginationSvc","account":"251270210711","time":"2025-12-03T10:00:19Z","region":"us-east-1","resources":[],"detail":{"ApplicationId":"505140e4-4be1-4842-952a-6e5ed463493a","DocType":2,"Path":"UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/IDENTITYDOCUMENT/passport-specimen.jpg","UtcTime":"12/03/2025 10:00"}}
+e874cf62-2dde-3746-985f-592e28c6ca5c
+2025-12-03T10:00:20.000Z
+{
+    "version": "0",
+    "id": "54db2c14-9553-30d5-84c2-c5b37f087b4d",
+    "detail-type": "application.document.processed",
+    "source": "DocumentProcessingSvc",
+    "account": "251270210711",
+    "time": "2025-12-03T10:00:20Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "ApplicationId": "505140e4-4be1-4842-952a-6e5ed463493a",
+        "Path": "UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/INCOMESTATEMENT/payslip-dog.jpg",
+        "DocType": 1,
+        "Status": 10,
+        "Remarks": "Income 5000.00 meets income criteria"
+    }
+}
+
+{"version":"0","id":"54db2c14-9553-30d5-84c2-c5b37f087b4d","detail-type":"application.document.processed","source":"DocumentProcessingSvc","account":"251270210711","time":"2025-12-03T10:00:20Z","region":"us-east-1","resources":[],"detail":{"ApplicationId":"505140e4-4be1-4842-952a-6e5ed463493a","Path":"UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/INCOMESTATEMENT/payslip-dog.jpg","DocType":1,"Status":10,"Remarks":"Income 5000.00 meets income criteria"}}
+95ffad1b-bc4b-34c5-9578-842991039af1
+2025-12-03T10:00:21.000Z
+{
+    "version": "0",
+    "id": "4722210a-05f4-accd-5b60-92abd74859b8",
+    "detail-type": "application.data.add",
+    "source": "OriginationSvc",
+    "account": "251270210711",
+    "time": "2025-12-03T10:00:21Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "ApplicationId": "505140e4-4be1-4842-952a-6e5ed463493a",
+        "UtcTime": "12/03/2025 10:00"
+    }
+}
+
+{"version":"0","id":"4722210a-05f4-accd-5b60-92abd74859b8","detail-type":"application.data.add","source":"OriginationSvc","account":"251270210711","time":"2025-12-03T10:00:21Z","region":"us-east-1","resources":[],"detail":{"ApplicationId":"505140e4-4be1-4842-952a-6e5ed463493a","UtcTime":"12/03/2025 10:00"}}
+0bbadb66-cf1f-3f67-83bc-a98e84ac7031
+2025-12-03T10:00:23.000Z
+{
+    "version": "0",
+    "id": "3905f4f6-1ead-a7cc-ec1b-ee522e807569",
+    "detail-type": "application.kyc.try",
+    "source": "OriginationSvc",
+    "account": "251270210711",
+    "time": "2025-12-03T10:00:23Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "ApplicationId": "505140e4-4be1-4842-952a-6e5ed463493a",
+        "Path1": "UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/IDENTITYDOCUMENT/passport-specimen.jpg",
+        "Path2": "UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/SELFIE/sample-selfie.png",
+        "UtcTime": "12/03/2025 10:00"
+    }
+}
+
+{"version":"0","id":"3905f4f6-1ead-a7cc-ec1b-ee522e807569","detail-type":"application.kyc.try","source":"OriginationSvc","account":"251270210711","time":"2025-12-03T10:00:23Z","region":"us-east-1","resources":[],"detail":{"ApplicationId":"505140e4-4be1-4842-952a-6e5ed463493a","Path1":"UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/IDENTITYDOCUMENT/passport-specimen.jpg","Path2":"UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/SELFIE/sample-selfie.png","UtcTime":"12/03/2025 10:00"}}
+3468a8cf-7736-3f9d-baec-fa215a1f238a
+2025-12-03T10:00:23.000Z
+{
+    "version": "0",
+    "id": "40acd7ff-9cba-295d-8911-f971bab28fa2",
+    "detail-type": "application.file.upload",
+    "source": "OriginationSvc",
+    "account": "251270210711",
+    "time": "2025-12-03T10:00:23Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "ApplicationId": "505140e4-4be1-4842-952a-6e5ed463493a",
+        "DocType": 3,
+        "Path": "UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/SELFIE/sample-selfie.png",
+        "UtcTime": "12/03/2025 10:00"
+    }
+}
+
+{"version":"0","id":"40acd7ff-9cba-295d-8911-f971bab28fa2","detail-type":"application.file.upload","source":"OriginationSvc","account":"251270210711","time":"2025-12-03T10:00:23Z","region":"us-east-1","resources":[],"detail":{"ApplicationId":"505140e4-4be1-4842-952a-6e5ed463493a","DocType":3,"Path":"UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/SELFIE/sample-selfie.png","UtcTime":"12/03/2025 10:00"}}
+5b96e416-8b92-35d2-9c68-89d6935f4ae8
+2025-12-03T10:00:25.000Z
+{
+    "version": "0",
+    "id": "1998da0e-4750-0cc6-f68f-787e840927ed",
+    "detail-type": "application.image.processed",
+    "source": "ImageProcessingSvc",
+    "account": "251270210711",
+    "time": "2025-12-03T10:00:25Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "ApplicationId": "505140e4-4be1-4842-952a-6e5ed463493a",
+        "Path1": "UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/IDENTITYDOCUMENT/passport-specimen.jpg",
+        "Path2": "UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/SELFIE/sample-selfie.png",
+        "DocType": 3,
+        "Status": 2,
+        "Remarks": "Faces do not match"
+    }
+}
+
+{"version":"0","id":"1998da0e-4750-0cc6-f68f-787e840927ed","detail-type":"application.image.processed","source":"ImageProcessingSvc","account":"251270210711","time":"2025-12-03T10:00:25Z","region":"us-east-1","resources":[],"detail":{"ApplicationId":"505140e4-4be1-4842-952a-6e5ed463493a","Path1":"UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/IDENTITYDOCUMENT/passport-specimen.jpg","Path2":"UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/SELFIE/sample-selfie.png","DocType":3,"Status":2,"Remarks":"Faces do not match"}}
+171ef0b6-f99d-3f2e-86f5-316545709d3e
+2025-12-03T10:00:26.000Z
+{
+    "version": "0",
+    "id": "787d3ca8-8694-9682-7eee-fdd19fcd7382",
+    "detail-type": "application.data.add",
+    "source": "OriginationSvc",
+    "account": "251270210711",
+    "time": "2025-12-03T10:00:26Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "ApplicationId": "505140e4-4be1-4842-952a-6e5ed463493a",
+        "UtcTime": "12/03/2025 10:00"
+    }
+}
+
+{"version":"0","id":"787d3ca8-8694-9682-7eee-fdd19fcd7382","detail-type":"application.data.add","source":"OriginationSvc","account":"251270210711","time":"2025-12-03T10:00:26Z","region":"us-east-1","resources":[],"detail":{"ApplicationId":"505140e4-4be1-4842-952a-6e5ed463493a","UtcTime":"12/03/2025 10:00"}}
+13de1491-8673-3518-8e41-fcd8af7e8514
+2025-12-03T10:00:29.000Z
+{
+    "version": "0",
+    "id": "35c51b9c-b51b-951b-648f-29b7bb3910b9",
+    "detail-type": "application.document.processed",
+    "source": "DocumentProcessingSvc",
+    "account": "251270210711",
+    "time": "2025-12-03T10:00:29Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "ApplicationId": "505140e4-4be1-4842-952a-6e5ed463493a",
+        "Path": "UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/IDENTITYDOCUMENT/passport-specimen.jpg",
+        "DocType": 2,
+        "Status": 10,
+        "Remarks": "Document expiry date: 2031-01-12"
+    }
+}
+
+{"version":"0","id":"35c51b9c-b51b-951b-648f-29b7bb3910b9","detail-type":"application.document.processed","source":"DocumentProcessingSvc","account":"251270210711","time":"2025-12-03T10:00:29Z","region":"us-east-1","resources":[],"detail":{"ApplicationId":"505140e4-4be1-4842-952a-6e5ed463493a","Path":"UserUploads/505140e4-4be1-4842-952a-6e5ed463493a/IDENTITYDOCUMENT/passport-specimen.jpg","DocType":2,"Status":10,"Remarks":"Document expiry date: 2031-01-12"}}
+fe5fa9bf-3a68-3308-806e-25c36390d2a9
+2025-12-03T10:00:30.000Z
+{
+    "version": "0",
+    "id": "2dc043ca-5d73-01f6-7b2d-ece1ef8ec29b",
+    "detail-type": "application.data.add",
+    "source": "OriginationSvc",
+    "account": "251270210711",
+    "time": "2025-12-03T10:00:30Z",
+    "region": "us-east-1",
+    "resources": [],
+    "detail": {
+        "ApplicationId": "505140e4-4be1-4842-952a-6e5ed463493a",
+        "UtcTime": "12/03/2025 10:00"
+    }
+}
+
+{"version":"0","id":"2dc043ca-5d73-01f6-7b2d-ece1ef8ec29b","detail-type":"application.data.add","source":"OriginationSvc","account":"251270210711","time":"2025-12-03T10:00:30Z","region":"us-east-1","resources":[],"detail":{"ApplicationId":"505140e4-4be1-4842-952a-6e5ed463493a","UtcTime":"12/03/2025 10:00"}}
+252b4ff2-3539-3317-9f0f-fb9c2bdaa2bb
+20 events loaded
