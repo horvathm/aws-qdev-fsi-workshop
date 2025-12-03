@@ -9,6 +9,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
 builder.Services.AddSingleton<IAWSConfig, AWSConfig>();
+builder.Services.AddScoped<IApplicationService, ApplicationService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

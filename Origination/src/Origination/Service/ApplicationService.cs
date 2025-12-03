@@ -36,7 +36,13 @@ namespace Origination.Service
         {
             try
             {
-                throw new NotImplementedException();
+                var application = _dbContext.LoadAsync<Application>(applicationId).GetAwaiter().GetResult();
+                if (application == null)
+                {
+                    _logger.LogWarning($"Application with ID {applicationId} not found");
+                    throw new InvalidOperationException($"Application with ID {applicationId} not found");
+                }
+                return application;
             }
             catch (ResourceNotFoundException)
             {
@@ -54,7 +60,12 @@ namespace Origination.Service
         {
             try
             {
-                throw new NotImplementedException();
+                _dbContext.SaveAsync(application).GetAwaiter().GetResult();
+                PublishEvent("application.started", new
+                {
+                    ApplicationId = application.ApplicationId,
+                    UtcTime = DateTime.UtcNow.ToString("g")
+                });
             }
             catch (ConditionalCheckFailedException)
             {
@@ -72,7 +83,21 @@ namespace Origination.Service
         {
             try
             {
-                throw new NotImplementedException();
+                // Verify the item exists first
+                var existingApplication = GetApplication(application.ApplicationId);
+                if (existingApplication == null)
+                {
+                    _logger.LogWarning($"Application with ID {application.ApplicationId} not found, nothing is updated");
+                    throw new KeyNotFoundException($"Application with ID {application.ApplicationId} not found");
+                }
+
+                // Save the updated application
+                _dbContext.SaveAsync(application).GetAwaiter().GetResult();
+                PublishEvent("application.data.add", new
+                {
+                    ApplicationId = application.ApplicationId,
+                    UtcTime = DateTime.UtcNow.ToString("g")
+                });
             }
             catch (ConditionalCheckFailedException)
             {
@@ -105,7 +130,52 @@ namespace Origination.Service
 
             try
             {
-                throw new NotImplementedException();
+                var s3UploadFolder = _awsConfig.GetStringFromSSM(_configuration["AWS:S3:UploadFolder"]);
+                var s3Key = $"{s3UploadFolder}/{applicationId}/{docuType}/{fileName}";
+                var bucketName = _awsConfig.GetStringFromSSM(_configuration["AWS:S3:BucketName"]);
+                using (TransferUtility utility = new TransferUtility(_s3Client))
+                {
+                    TransferUtilityUploadRequest request = new TransferUtilityUploadRequest();
+                    request.BucketName = bucketName;
+                    request.Key = s3Key;
+                    request.InputStream = file;
+                    utility.Upload(request);
+                }
+
+                switch (docuType)
+                {
+                    case DocumentType.INCOMESTATEMENT:
+                        application.Status.IncomeRequirement.FileRef = s3Key;
+                        break;
+                    case DocumentType.IDENTITYDOCUMENT:
+                        application.Status.IdDocValidity.FileRef = s3Key;
+                        break;
+                    case DocumentType.SELFIE:
+                        application.Status.Ekyc.FileRef = s3Key;
+                        break;
+                }
+                _dbContext.SaveAsync(application).GetAwaiter().GetResult();
+
+                PublishEvent("application.file.upload", new
+                {
+                    ApplicationId = application.ApplicationId,
+                    DocType = (int)docuType,
+                    Path = s3Key,
+                    UtcTime = DateTime.UtcNow.ToString("g")
+                });
+                if ((docuType == DocumentType.IDENTITYDOCUMENT || docuType == DocumentType.SELFIE)
+                    && !(application.Status.Ekyc.Status == 10 && application.Status.IdDocValidity.Status == 10)
+                    && !string.IsNullOrEmpty(application.Status.Ekyc.FileRef)
+                    && !string.IsNullOrEmpty(application.Status.IdDocValidity.FileRef))
+                {
+                    PublishEvent("application.kyc.try", new
+                    {
+                        ApplicationId = application.ApplicationId,
+                        Path1 = application.Status.IdDocValidity.FileRef,
+                        Path2 = application.Status.Ekyc.FileRef,
+                        UtcTime = DateTime.UtcNow.ToString("g")
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -124,7 +194,7 @@ namespace Origination.Service
                                 {
                                     new Amazon.EventBridge.Model.PutEventsRequestEntry()
                                     {
-                                        EventBusName = _awsconfig.GetStringFromSSM(_configuration["AWS:EventBridge:EventbusName"]),
+                                        EventBusName = _awsConfig.GetStringFromSSM(_configuration["AWS:EventBridge:EventbusName"]),
                                         Source = _configuration["ServiceName"],
                                         Detail = JsonSerializer.Serialize(payload),
                                         DetailType = eventName,
@@ -146,5 +216,4 @@ namespace Origination.Service
         }
 
     }
-
 }

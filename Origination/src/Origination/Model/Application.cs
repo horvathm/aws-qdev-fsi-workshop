@@ -39,12 +39,22 @@ namespace Origination.Model
         }
     }
 
+    [DynamoDBTable("Application")]
     public class Application
     {
+        [DynamoDBHashKey]
         public Guid ApplicationId { get; set; }
+
+        [DynamoDBProperty]
         public DateTime ApplicationDate { get; set; }
+
+        [DynamoDBProperty]
         public string ProductType { get; set; }
+
+        [DynamoDBProperty]
         public ApplicationStatus Status { get; set; } = new ApplicationStatus();
+
+        [DynamoDBProperty]
         public Customer Applicant { get; set; } = new Customer();
     }
 }

@@ -36,7 +36,8 @@ public class ApplicationController : ControllerBase
         };
         try
         {
-            throw new NotImplementedException();
+            _applicationService.CreateApplication(basicApplication);
+            return StatusCode(StatusCodes.Status201Created, new ApplicationResponse() { Code = StatusCodes.Status201Created, Message = $"Application record created {basicApplication.ApplicationId}" });
         }
         catch (Exception)
         {
@@ -50,7 +51,14 @@ public class ApplicationController : ControllerBase
     {
         try
         {
-            throw new NotImplementedException();
+            var recordToUpdate = _applicationService.GetApplication(applicationId);
+            //immutable fields: Id, FirstName, LastName, Email
+            applicant.Id = recordToUpdate.Applicant.Id;
+            applicant.FirstName = recordToUpdate.Applicant.FirstName;
+            applicant.LastName = recordToUpdate.Applicant.LastName;
+            recordToUpdate.Applicant = applicant;
+            _applicationService.UpdateApplication(recordToUpdate);
+            return StatusCode(StatusCodes.Status200OK, new ApplicationResponse() { Code = StatusCodes.Status200OK, Message = "Application record updated" });
         }
         catch (Exception)
         {
@@ -63,7 +71,8 @@ public class ApplicationController : ControllerBase
     {
         try
         {
-            throw new NotImplementedException();
+            _applicationService.SubmitApplicationFile(applicationId, docuType, file.FileName, file.OpenReadStream());
+            return StatusCode(StatusCodes.Status201Created, new ApplicationResponse() { Code = StatusCodes.Status201Created, Message = "Application document submitted" });
         }
         catch (Exception)
         {
@@ -73,15 +82,14 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpGet("{applicationId}", Name = "ApplicationDetails")]
-    public IActionResult Get(Guid applicationId)
+    public Application Get(Guid applicationId)
     {
         try
         {
-            throw new NotImplementedException();
+            return _applicationService.GetApplication(applicationId);
         }
         catch (Exception)
         {
-            Response.StatusCode = StatusCodes.Status500InternalServerError;
             return null;
         }
     }
@@ -92,11 +100,16 @@ public class ApplicationController : ControllerBase
     {
         try
         {
-            throw new NotImplementedException();
+            var application = _applicationService.GetApplication(applicationId);
+            if (application == null)
+            {
+                return -500;
+            }
+
+            return application.Status.OverallStatus;
         }
         catch (Exception)
         {
-            Response.StatusCode = StatusCodes.Status500InternalServerError;
             return -500;
         }
     }
@@ -106,14 +119,31 @@ public class ApplicationController : ControllerBase
     {
         try
         {
-            throw new NotImplementedException();
+            var recordToUpdate = _applicationService.GetApplication(applicationId);
+            switch (newStatus.DocType)
+            {
+                case DocumentType.INCOMESTATEMENT:
+                    recordToUpdate.Status.IncomeRequirement.Status = (int)newStatus.NewStatus;
+                    recordToUpdate.Status.IncomeRequirement.Remarks = newStatus.Remarks;
+                    break;
+                case DocumentType.IDENTITYDOCUMENT:
+                    recordToUpdate.Status.IdDocValidity.Status = (int)newStatus.NewStatus;
+                    recordToUpdate.Status.IdDocValidity.Remarks = newStatus.Remarks;
+                    break;
+                case DocumentType.SELFIE:
+                    recordToUpdate.Status.Ekyc.Status = (int)newStatus.NewStatus;
+                    recordToUpdate.Status.Ekyc.Remarks = newStatus.Remarks;
+                    break;
+                default:
+                    break;
+            }
+
+            _applicationService.UpdateApplication(recordToUpdate);
+            return StatusCode(StatusCodes.Status200OK, new ApplicationResponse() { Code = StatusCodes.Status200OK, Message = "Application status updated" });
         }
         catch (Exception)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, new ApplicationResponse() { Code = StatusCodes.Status500InternalServerError, Message = "Error while updating application record" });
         }
     }
-
-
-
 }
