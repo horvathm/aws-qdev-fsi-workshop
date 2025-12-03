@@ -56,11 +56,28 @@ namespace OriginationCdk
             // Use FARGATE, set cpu = 512 and memory = 1024
             // Use Linux on ARM64
             // For the TaskRole, look up existing IAM role called OriginationTaskRole
-            TaskDefinition originationTaskDefn = 
+            TaskDefinition originationTaskDefn = new TaskDefinition(this, "OriginationTaskDefn", new TaskDefinitionProps
+            {
+                Family = "DigitalOriginationMicrosvc",
+                Compatibility = Compatibility.FARGATE,
+                Cpu = "512",
+                MemoryMiB = "1024",
+                TaskRole = Role.FromRoleName(this, "EcsTaskRole", "WorkshopOriginationTaskRole"),
+                ExecutionRole = Role.FromRoleName(this, "EcsTaskExecutionRole", "WorkshopEcsTaskExecutionRole"),
+                RuntimePlatform = new RuntimePlatform
+                {
+                    OperatingSystemFamily = OperatingSystemFamily.LINUX,
+                    CpuArchitecture = CpuArchitecture.ARM64
+                },
+            });
 
             // Build the Docker Image OriginationEcrAsset to use with Amazon ECR, target Linux on ARM64 
             // Dockerfile path would be in "/workshop-folder/Origination/src/Origination"
-            var originationEcrAsset = 
+            var originationEcrAsset = new Amazon.CDK.AWS.Ecr.Assets.DockerImageAsset(this, "OriginationEcrAsset", new DockerImageAssetProps
+            {
+                Directory = Path.GetFullPath("/workshop-folder/Origination/src/Origination"),
+                Platform = Platform_.LINUX_ARM64
+            });
 
             // Add the originationEcrAsset container into the task definition originationTaskDefn
             // Set memory limit to 1024 and mark this as essential container
@@ -71,11 +88,50 @@ namespace OriginationCdk
             // Define health check using CMD wget --no-verbose --tries=1 --spider http://localhost:6268/hc || exit 1
             // Health check internal is 30s, timeout 10s, start period 30s, retry up to 3 times
             // Map port 6268 to container
-            ContainerDefinition originationContainer = 
+            ContainerDefinition originationContainer = originationTaskDefn.AddContainer("OriginationContainer", new ContainerDefinitionOptions
+            {
+                Image = ContainerImage.FromDockerImageAsset(originationEcrAsset),
+                MemoryLimitMiB = 1024,
+                Essential = true,
+                Logging = new AwsLogDriver(new AwsLogDriverProps
+                {
+                    LogGroup = originationSvcLogs,
+                    StreamPrefix = "api-logs"
+                }),
+                Environment = new Dictionary<string, string>() {
+                    {"ASPNETCORE_URLS", "http://+:6268"},
+                    {"ASPNETCORE_ENVIRONMENT", "Development"}
+                },
+                HealthCheck = new Amazon.CDK.AWS.ECS.HealthCheck
+                {
+                    Command = new[] {
+                        "CMD-SHELL",
+                        "wget --no-verbose --tries=1 --spider http://localhost:6268/hc -O /dev/null 2>&1 || exit 1"
+                        },
+                    Interval = Duration.Seconds(30),
+                    Timeout = Duration.Seconds(10),
+                    Retries = 3,
+                    StartPeriod = Duration.Seconds(60)
+                },
+                PortMappings = new[] { new PortMapping { ContainerPort = 6268 } }
+            });
 
             // Create the ECS Fargate Service using the ECS cluster, task definition and security group defined above
             // Set desired count to 2, deploy them onto private subnets one per AZ and ensure all containers are healthy
-            FargateService ecsFargateService = 
+            FargateService ecsFargateService = new FargateService(this, "EcsFargateService", new FargateServiceProps
+            {
+                Cluster = originationCluster,
+                DesiredCount = 2,
+                TaskDefinition = originationTaskDefn,
+                SecurityGroups = new[] { originationSG },
+                MaxHealthyPercent = 200,
+                MinHealthyPercent = 100,
+                VpcSubnets = new SubnetSelection
+                {
+                    SubnetType = SubnetType.PRIVATE_WITH_EGRESS,
+                    OnePerAz = true
+                }
+            });
             #endregion
 
             #region Vpc Link
@@ -90,7 +146,6 @@ namespace OriginationCdk
                 AllowAllOutbound = true,
                 SecurityGroupName = "NlbSG"
             });
-            nlbSG.Connections.AllowFromAnyIpv4(Port.HTTP, "Allow http ingress");
 
             // Allow the originationSG to receive inbound Tcp connection on port 6268 from nlbSG
             originationSG.Connections.AllowFrom(nlbSG, Port.Tcp(6268), "Ingress from nlbSG");
@@ -103,7 +158,7 @@ namespace OriginationCdk
                 Vpc = labVpc,
                 InternetFacing = false,
                 SecurityGroups = new[] { nlbSG },
-                EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic = false,
+                EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic = false, //allows VPC link traffic
                 VpcSubnets = new SubnetSelection
                 {
                     SubnetType = SubnetType.PRIVATE_WITH_EGRESS,
@@ -150,21 +205,6 @@ namespace OriginationCdk
                 {
                     Types = new[] { EndpointType.REGIONAL },
                 },
-                //    Policy = new PolicyDocument(new PolicyDocumentProps
-                //    {
-                //        Statements = new[] {
-                //           new PolicyStatement(new PolicyStatementProps
-                //            {
-                //                Effect = Effect.ALLOW,
-                //                Actions = new[] { "execute-api:Invoke" },
-                //                Resources = new[] { "execute-api:/*" },
-                //                Principals = new[] { 
-                //                    new ArnPrincipal($"arn:aws:iam::{Of(this).Account}:role/WorkshopEventBridgeApiCaller"),
-                //                    new ArnPrincipal($"arn:aws:iam::{Of(this).Account}:role/DevBoxInstanceProfileRole"),
-                //                }
-                //            })
-                //        }
-                //    }),
                 DefaultCorsPreflightOptions = new CorsOptions
                 {
                     AllowOrigins = Cors.ALL_ORIGINS,
@@ -369,6 +409,9 @@ namespace OriginationCdk
                 {
                     StageName = "prod",
                     Deployment = deployment,
+                    DataTraceEnabled = true,
+                    MetricsEnabled = true,
+                    LoggingLevel = MethodLoggingLevel.INFO
                 });
 
             originationApi.DeploymentStage = prodStage;
@@ -378,8 +421,8 @@ namespace OriginationCdk
             var eventBus = EventBus.FromEventBusName(this, "WorkshopEventBus", "workshop-events");
             var rule = new Rule(this, "StatusUpdateRule", new RuleProps
             {
-                EventBus = eventBus,
-                RuleName = "StatusUpdate",
+                EventBus = eventBus, 
+                RuleName = "StatusUpdate", 
                 EventPattern = new EventPattern
                 {
                     DetailType = new[] { "application.image.processed", "application.document.processed" }
@@ -387,7 +430,7 @@ namespace OriginationCdk
             });
 
             var cfnRule = rule.Node.DefaultChild as Amazon.CDK.AWS.Events.CfnRule;
-
+            
             if (cfnRule != null)
             {
                 var method = "POST";
@@ -401,7 +444,7 @@ namespace OriginationCdk
                     {
                         Arn = arn,
                         Id = "ApiGatewayTarget",
-                        RoleArn = Role.FromRoleArn(this, "EventBridgeApiCallerRole",
+                        RoleArn = Role.FromRoleArn(this, "EventBridgeApiCallerRole", 
                             $"arn:aws:iam::{Of(this).Account}:role/WorkshopEventBridgeApiCaller").RoleArn,
                         HttpParameters = new Amazon.CDK.AWS.Events.CfnRule.HttpParametersProperty
                         {
@@ -419,7 +462,7 @@ namespace OriginationCdk
                                 ["status"] = "$.detail.Status",
                                 ["remarks"] = "$.detail.Remarks"
                             },
-                            InputTemplate = "{ \"DocType\": \"<doctype>\", \"NewStatus\": \"<status>\", \"Remarks\": \"<remarks>\" }"
+                            InputTemplate = "{ \"DocType\": <doctype>, \"NewStatus\": <status>, \"Remarks\": \"<remarks>\" }"
                         }
                     }
                 };

@@ -1,0 +1,152 @@
+docker build -t origination-api .
+docker images
+docker run -d -p 6268:6268 --name origination-api-container origination-api
+
+
+participant:/workshop-folder/Origination/src/Origination$ curl -X POST http://localhost:6268/Application \
+-H "Content-Type: application/json" \
+-d '{
+  "productType": "CCard001",
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "email": "jane@example.com"
+}' | jq '.'
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   194    0    88  100   106    372    448 --:--:-- --:--:-- --:--:--   822
+{
+  "code": 201,
+  "message": "Application record created beda96c5-dee5-4f5c-8799-c0f9d269c264"
+}
+participant:/workshop-folder/Origination/src/Origination$ curl http://localhost:6268/Application/{ApplicationId} | jq '.'
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   263    0   263    0     0   6434      0 --:--:-- --:--:-- --:--:--  6575
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "applicationId": [
+      "The value 'ApplicationId' is not valid."
+    ]
+  },
+  "traceId": "00-c2917d014545b85040e42cbdaa983f2f-c39e973eda4d1f5c-00"
+}
+participant:/workshop-folder/Origination/src/Origination$ curl http://localhost:6268/Application/beda96c5-dee5-4f5c-8799-c0f9d269c264 | jq '.'
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   575    0   575    0     0   6783      0 --:--:-- --:--:-- --:--:--  6845
+{
+  "applicationId": "beda96c5-dee5-4f5c-8799-c0f9d269c264",
+  "applicationDate": "2025-12-03T09:33:24.345Z",
+  "productType": "CCard001",
+  "status": {
+    "ekyc": {
+      "status": 0,
+      "fileRef": null,
+      "remarks": null
+    },
+    "idDocValidity": {
+      "status": 0,
+      "fileRef": null,
+      "remarks": null
+    },
+    "incomeRequirement": {
+      "status": 0,
+      "fileRef": null,
+      "remarks": null
+    },
+    "overallStatus": 0
+  },
+  "applicant": {
+    "id": "70f40b9a-18d9-4cdb-8f87-c534dc5833a9",
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "dateOfBirth": "0001-01-01T00:00:00Z",
+    "email": "jane@example.com",
+    "phoneNumber": null,
+    "address": null,
+    "city": null,
+    "state": null,
+    "postCode": null,
+    "country": null
+  }
+}
+
+
+
+
+
+curl -X POST http://localhost:6268/Application/beda96c5-dee5-4f5c-8799-c0f9d269c264/customer \
+-H "Content-Type: application/json" \
+-d '{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "dateOfBirth": "1981-12-10",
+  "email": "updated.email@example.com",
+  "phoneNumber": "555-0112",
+  "address": "18 Hwy 50",
+  "city": "Stateline",
+  "state": "Nevada",
+  "postCode": "89449",
+  "country": "USA"
+}' | jq '.'
+
+
+
+ % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   310    0    51  100   259     29    150  0:00:01  0:00:01 --:--:--   180
+{
+  "code": 200,
+  "message": "Application record updated"
+}
+
+
+
+
+participant:/workshop-folder/Origination/src/Origination$ curl http://localhost:6268/Application/beda96c5-dee5-4f5c-8799-c0f9d269c264 | jq '.'
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   612    0   612    0     0  22214      0 --:--:-- --:--:-- --:--:-- 22666
+{
+  "applicationId": "beda96c5-dee5-4f5c-8799-c0f9d269c264",
+  "applicationDate": "2025-12-03T09:33:24.345Z",
+  "productType": "CCard001",
+  "status": {
+    "ekyc": {
+      "status": 0,
+      "fileRef": null,
+      "remarks": null
+    },
+    "idDocValidity": {
+      "status": 0,
+      "fileRef": null,
+      "remarks": null
+    },
+    "incomeRequirement": {
+      "status": 0,
+      "fileRef": null,
+      "remarks": null
+    },
+    "overallStatus": 0
+  },
+  "applicant": {
+    "id": "70f40b9a-18d9-4cdb-8f87-c534dc5833a9",
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "dateOfBirth": "1981-12-10T00:00:00Z",
+    "email": "updated.email@example.com",
+    "phoneNumber": "555-0112",
+    "address": "18 Hwy 50",
+    "city": "Stateline",
+    "state": "Nevada",
+    "postCode": "89449",
+    "country": "USA"
+  }
+}
+
+
+
+docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)
