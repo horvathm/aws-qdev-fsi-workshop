@@ -69,29 +69,97 @@ namespace DocumentProcessing.Services
                 });
             }
 
-            //invoke Textract on the document in S3, put the analysis result into a variable called response
-            AnalyzeDocumentResponse response = new AnalyzeDocumentResponse();
-            response = 
+            // invoke Textract on the document in S3, put the analysis result into a variable called response
+            AnalyzeDocumentResponse response = await _textractClient.AnalyzeDocumentAsync(new AnalyzeDocumentRequest
+            {
+                Document = new Document { S3Object = new S3Object { Bucket = s3BucketName, Name = path } },
+                FeatureTypes = new List<string> { "QUERIES" },
+                QueriesConfig = queriesConfig
+            }); 
 
             // Extract the query results from the Textract response into a variable called answers
             // I need only the response blocks containing query results.
-            IEnumerable<Block> answers = 
+            IEnumerable<Block> answers = response.Blocks.Where(b => b.BlockType == BlockType.QUERY_RESULT); 
 
             // ensure that there is exactly 1 answer
             // else we will publish a failure event indicating no answer or multiple answers found and exit
+            if (answers.Count() != 1)
+            {
+                var result = new DocumentProcessingResult
+                {
+                    ApplicationId = applicationId,
+                    Path = path,
+                    DocType = (int)docType,
+                    Status = 2,
+                    Remarks = answers.Count() == 0 ? "No answer found" : "Multiple answers found"
+                };
+                PublishEvent(result);
+                return result;
+            }
 
             // evaluate against business rule depending on the document type
-            // if docType is DocumentType.INCOMESTATEMENT, try to parse the extracted income string as decimal based on the answer
-            // If it can be parsed, publish an application.document.processed event
-            // If the extracted income >= minIncome Status of event is 10, remarks say income meets criteria
-            //    Otherwise Status of event is 1 and remarks say income does not meet criteria
-            // If the answer can't be parsed as decimal, publish a failure event and remarks saying income is not a proper numeric format
-
-            // if docType is DocumentType.IDENTITYDOCUMENT, try to parse the extracted expiry date string as DateTime based on the answer
-            // If it can be parsed, publish an application.document.processed event
-            // If the extracted date is in the future, Status of event is 10, otherwise status is 1
-            // State expiry ddate in yyyy-MM-dd format in the remarks
-            // If the answer can't be parsed as DateTime, publish a failure event and remarks saying income is not a proper date format
+            var answer = answers.First();
+            var answerText = answer.Text;
+            
+            if (docType == DocumentType.INCOMESTATEMENT)
+            {
+                if (decimal.TryParse(answerText, out decimal income))
+                {
+                    var result = new DocumentProcessingResult
+                    {
+                        ApplicationId = applicationId,
+                        Path = path,
+                        DocType = (int)docType,
+                        Status = income >= minIncome ? 10 : 1,
+                        Remarks = income >= minIncome ? "Income meets criteria" : "Income does not meet criteria"
+                    };
+                    PublishEvent(result);
+                    return result;
+                }
+                else
+                {
+                    var result = new DocumentProcessingResult
+                    {
+                        ApplicationId = applicationId,
+                        Path = path,
+                        DocType = (int)docType,
+                        Status = 2,
+                        Remarks = "Income is not a proper numeric format"
+                    };
+                    PublishEvent(result);
+                    return result;
+                }
+            }
+            
+            if (docType == DocumentType.IDENTITYDOCUMENT)
+            {
+                if (DateTime.TryParse(answerText, out DateTime expiryDate))
+                {
+                    var result = new DocumentProcessingResult
+                    {
+                        ApplicationId = applicationId,
+                        Path = path,
+                        DocType = (int)docType,
+                        Status = expiryDate > DateTime.Now ? 10 : 1,
+                        Remarks = $"Expiry date {expiryDate:yyyy-MM-dd}"
+                    };
+                    PublishEvent(result);
+                    return result;
+                }
+                else
+                {
+                    var result = new DocumentProcessingResult
+                    {
+                        ApplicationId = applicationId,
+                        Path = path,
+                        DocType = (int)docType,
+                        Status = 2,
+                        Remarks = "Date is not a proper date format"
+                    };
+                    PublishEvent(result);
+                    return result;
+                }
+            }
 
             //if it ever come to here, throw exception indicating this is unknown state
             throw new Exception("Unknown state");
@@ -106,9 +174,31 @@ namespace DocumentProcessing.Services
         /// Use the source as specified in ServiceName environment variable
         /// Logs the published event details.
         /// </summary>
-        public void PublishEvent(object payload, string? eventNameOverride = "")
+        public async void PublishEvent(object payload, string? eventNameOverride = "")
         {
+            var eventName = !string.IsNullOrEmpty(eventNameOverride) 
+                ? eventNameOverride 
+                : Environment.GetEnvironmentVariable("EventName") ?? "application.document.processed";
             
+            var eventBusName = Environment.GetEnvironmentVariable("EventbusName");
+            var source = Environment.GetEnvironmentVariable("ServiceName");
+            
+            var putEventsRequest = new PutEventsRequest
+            {
+                Entries = new List<PutEventsRequestEntry>
+                {
+                    new PutEventsRequestEntry
+                    {
+                        EventBusName = eventBusName,
+                        Source = source,
+                        DetailType = eventName,
+                        Detail = JsonSerializer.Serialize(payload)
+                    }
+                }
+            };
+            
+            await _eventBridgeClient.PutEventsAsync(putEventsRequest);
+            _logger.LogInformation($"Published event: {eventName} to bus: {eventBusName} from source: {source}");
         }
 
         public void Dispose()
