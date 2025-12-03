@@ -8,7 +8,8 @@
   "function-runtime": "dotnet8",
   "function-memory-size": 512,
   "function-timeout": 90,
+  "function-architecture": "x86_64",
   "environment-variables": "\"S3BucketName\"=\"workshop-dev-251270210711\";\"ServiceName\"=\"ImageProcessingSvc\";\"EventName\"=\"application.image.processed\";\"EventbusName\"=\"workshop-events\";\"SimilarityScoreThreshold\"=\"90\";",
-  "function-role": "Your-LambdaExecutionRole",
+  "function-role": "WorkshopLambdaExecutionRole",
   "function-handler": "ImageProcessing::ImageProcessing.Function::Handler"
 }
